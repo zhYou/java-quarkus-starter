@@ -1,0 +1,39 @@
+x-node: &node
+  image: citusdata/citus:14.2.0-alpine@sha256:703d5b9f830dc38e265c0135223f0e12a5dc82cb2b0899b47ae37290cdacfce0
+  command: [postgres, -c, shared_preload_libraries=citus, -c, citus.node_conninfo=sslmode=disable]
+  environment: &environment
+    POSTGRES_DB: starter
+    POSTGRES_USER: bootstrap
+    POSTGRES_PASSWORD: ${APP_DB_ADMIN_PASSWORD:?local admin password required}
+    APP_DB_PASSWORD: ${APP_DB_PASSWORD:?runtime password required}
+    APP_DB_MIGRATION_PASSWORD: ${APP_DB_MIGRATION_PASSWORD:?migration password required}
+  healthcheck:
+    test: [CMD-SHELL, "pg_isready -h 127.0.0.1 -U bootstrap -d starter"]
+    interval: 2s
+    timeout: 3s
+    retries: 30
+services:
+  coordinator:
+    <<: *node
+    ports: ["127.0.0.1:${APP_DB_PORT:-55432}:5432"]
+    volumes:
+      - coordinator:/var/lib/postgresql
+      - ./init/001_roles.sh:/docker-entrypoint-initdb.d/001_roles.sh:ro
+      - ./init/002_topology.sql:/opt/starter/topology.sql:ro
+    depends_on:
+      worker1: {condition: service_healthy}
+      worker2: {condition: service_healthy}
+  worker1:
+    <<: *node
+    volumes:
+      - worker1:/var/lib/postgresql
+      - ./init/001_roles.sh:/docker-entrypoint-initdb.d/001_roles.sh:ro
+  worker2:
+    <<: *node
+    volumes:
+      - worker2:/var/lib/postgresql
+      - ./init/001_roles.sh:/docker-entrypoint-initdb.d/001_roles.sh:ro
+volumes:
+  coordinator:
+  worker1:
+  worker2:

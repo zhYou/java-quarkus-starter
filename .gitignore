@@ -1,0 +1,13 @@
+.gradle/
+**/build/
+.local/
+.env
+.env.*
+!.env.example
+.superpowers/
+.idea/
+*.iml
+.serena/cache/
+.serena/memories/
+__pycache__/
+*.pyc

@@ -1,0 +1,8 @@
+**
+!cli/
+!cli/build/
+!cli/build/starter-cli-runner.jar
+!server/
+!server/build/
+!server/build/quarkus-app/
+!server/build/quarkus-app/**

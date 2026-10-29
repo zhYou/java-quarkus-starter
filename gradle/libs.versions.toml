@@ -1,0 +1,13 @@
+[versions]
+quarkus = "3.40.1.1"
+spotless = "8.10.4"
+archunit = "1.4.1"
+google-java-format = "1.36.1"
+
+[libraries]
+quarkus-bom = { module = "io.quarkus.platform:quarkus-bom", version.ref = "quarkus" }
+archunit = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+
+[plugins]
+quarkus = { id = "io.quarkus", version.ref = "quarkus" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

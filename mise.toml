@@ -1,0 +1,85 @@
+[bootstrap.packages]
+"apt:git" = { version = "latest", os = "linux" }
+"brew:git" = { version = "latest", os = "macos" }
+
+[tools]
+jq = "1.8.2"
+ripgrep = "15.2.0"
+ast-grep = "0.51.0"
+uv = "0.13.6"
+python = "3.13.18"
+"pipx:serena-agent" = "2.1.0"
+actionlint = "1.7.12"
+kubeconform = "0.8.0"
+
+[tasks.check]
+description = "Format, architecture, unit and ordinary PostgreSQL checks"
+run = "./gradlew check"
+
+[tasks.serena]
+description = "Start the optional Serena MCP server for this project"
+run = "python3 scripts/dev.py serena"
+
+[tasks."doctor"]
+description = "Check tools and Docker"
+run = "python3 scripts/dev.py doctor"
+
+[tasks."db:up"]
+description = "Start and migrate ordinary PostgreSQL"
+run = "python3 scripts/dev.py up"
+
+[tasks."db:down"]
+description = "Stop ordinary PostgreSQL, retain volume"
+run = "python3 scripts/dev.py down"
+
+[tasks."db:reset"]
+description = "Delete selected local volumes with explicit confirmation"
+run = "python3 scripts/dev.py reset"
+
+[tasks."sharding:up"]
+description = "Start and migrate Citus example"
+run = "python3 scripts/dev.py up --mode sharding"
+
+[tasks."sharding:down"]
+description = "Stop Citus, retain volumes"
+run = "python3 scripts/dev.py down --mode sharding"
+
+[tasks."sharding:reset"]
+description = "Delete Citus volumes with explicit confirmation"
+run = "python3 scripts/dev.py reset --mode sharding"
+
+[tasks."migrate"]
+description = "Apply independent migrations"
+run = "python3 scripts/dev.py migrate"
+
+[tasks."dev"]
+description = "Start server development mode"
+run = "python3 scripts/dev.py dev"
+
+[tasks."cli"]
+description = "Build and execute CLI with Gradle-managed Java"
+run = "python3 scripts/dev.py cli --"
+
+[tasks."sharding:check"]
+description = "Run physical sharding and recovery checks"
+run = "./gradlew shardingCheck"
+
+[tasks."package:check"]
+description = "Verify both real application artifacts"
+run = "./gradlew packageCheck"
+
+[tasks."db:backup"]
+description = "Dump ordinary PostgreSQL to a new file"
+run = "python3 scripts/dev.py export"
+
+[tasks."db:restore"]
+description = "Restore dump into a new local target"
+run = "python3 scripts/dev.py restore"
+
+[tasks."sharding:export"]
+description = "Export quiesced sample orders to a new file"
+run = "python3 scripts/dev.py export --mode sharding"
+
+[tasks."sharding:restore"]
+description = "Restore sample into a new Citus topology"
+run = "python3 scripts/dev.py restore --mode sharding"
