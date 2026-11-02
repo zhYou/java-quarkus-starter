@@ -12,6 +12,9 @@
 .idea/
 *.iml
 
+# Git 隔离工作区
+/.worktrees/
+
 # 智能体工具的本地工作记录与缓存
 .superpowers/
 .serena/cache/
