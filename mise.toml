@@ -1,3 +1,6 @@
+[settings]
+lockfile = false
+
 [bootstrap.packages]
 "apt:git" = { version = "latest", os = "linux" }
 "brew:git" = { version = "latest", os = "macos" }

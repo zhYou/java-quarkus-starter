@@ -12,9 +12,9 @@ CLI offline preflight 不启动 Quarkus；业务执行启用 CDI 请求上下文
 
 本地状态和凭据放 .local（目录700、文件600），禁止提交或打印。Docker 操作必须通过项目记录的 Compose 归属；down 保留卷，reset 要显式确认，禁止全局 prune。恢复总是新建目标，不自动替换源连接。Citus JSON 只用于本模板停写后的订单示例，生产使用专门备份方案。
 
-辅助工具依 mise.toml/mise.lock，Git 使用 mise bootstrap 的宿主软件包。Serena 按需 `mise run serena`，子进程复用 Gradle JDK；构建和 CI 不依赖 MCP。Serena 的 Python 传递依赖当前未完整锁定。
+辅助工具版本声明在 mise.toml，项目关闭 mise 锁文件，Git 使用 mise bootstrap 的宿主软件包。Serena 按需 `mise run serena`，子进程复用 Gradle JDK；构建和 CI 不依赖 MCP。Serena 的 Python 传递依赖当前未完整锁定。
 
-Quarkus BOM 与插件共用 gradle/libs.versions.toml 版本，保持 LTS 主线。依赖变更更新锁和 SHA-256 元数据，并重新跑相关真实测试。产物、CI、部署和文档中的命令要能复现。清单只暴露业务 Service，管理端口仅内部探针/指标。合并、发布和云资源操作须经用户明确授权。
+Quarkus BOM 与插件共用 gradle/libs.versions.toml 版本，保持 LTS 主线。依赖变更更新版本声明，并重新跑相关真实测试；不维护 Gradle/mise 锁文件或依赖校验元数据。保留 Wrapper 分发包与发布产物的 SHA-256 校验。产物、CI、部署和文档中的命令要能复现。清单只暴露业务 Service，管理端口仅内部探针/指标。合并、发布和云资源操作须经用户明确授权。
 
 设计和计划位于 docs/superpowers。提交前检查差异、忽略规则和相关验证结果；凭据、本地状态、缓存和构建产物不得提交。任务分支的提交、推送和 PR 按下文交付流程执行。
 

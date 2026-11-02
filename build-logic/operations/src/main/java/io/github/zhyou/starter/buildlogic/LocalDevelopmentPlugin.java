@@ -26,7 +26,6 @@ public final class LocalDevelopmentPlugin implements Plugin<Project> {
                 c -> {
                   c.setCanBeConsumed(false);
                   c.setCanBeResolved(true);
-                  c.getResolutionStrategy().activateDependencyLocking();
                   c.getAttributes()
                       .attribute(
                           Usage.USAGE_ATTRIBUTE,

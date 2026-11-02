@@ -8,6 +8,8 @@ import java.security.MessageDigest;
 import java.util.HexFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ReleaseFilesTest {
   @TempDir Path root;
@@ -55,14 +57,36 @@ class ReleaseFilesTest {
     assertFalse(Files.readString(root.resolve("SHA256SUMS")).contains("  SHA256SUMS"));
   }
 
-  @Test
-  void rootDependencyLocksArePartOfTheSourceIdentity() throws Exception {
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "gradle.lockfile",
+        "settings-gradle.lockfile",
+        "core/gradle.lockfile",
+        "cli/gradle.lockfile",
+        "server/gradle.lockfile",
+        "build-logic/conventions/gradle.lockfile",
+        "build-logic/operations/gradle.lockfile",
+        "mise.lock",
+        "gradle/verification-metadata.xml"
+      })
+  void retiredGeneratedFilesDoNotChangeSourceIdentity(String name) throws Exception {
     Files.writeString(root.resolve("build.gradle"), "plugins { id 'base' }\n");
     String first = ReleaseFiles.sourceDigest(root);
-    Files.writeString(root.resolve("gradle.lockfile"), "library:1=maintenanceRuntime\n");
-    String second = ReleaseFiles.sourceDigest(root);
-    assertNotEquals(first, second);
-    Files.writeString(root.resolve("settings-gradle.lockfile"), "resolver:1=classpath\n");
-    assertNotEquals(second, ReleaseFiles.sourceDigest(root));
+    Path generated = root.resolve(name);
+    Files.createDirectories(generated.getParent());
+    Files.writeString(generated, "local generated content\n");
+    assertEquals(first, ReleaseFiles.sourceDigest(root));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"gradle/libs.versions.toml", "mise.toml"})
+  void versionDeclarationsArePartOfTheSourceIdentity(String name) throws Exception {
+    Path config = root.resolve(name);
+    Files.createDirectories(config.getParent());
+    Files.writeString(config, "version = '1'\n");
+    String first = ReleaseFiles.sourceDigest(root);
+    Files.writeString(config, "version = '2'\n");
+    assertNotEquals(first, ReleaseFiles.sourceDigest(root));
   }
 }

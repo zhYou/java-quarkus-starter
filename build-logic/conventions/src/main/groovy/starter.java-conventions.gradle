@@ -25,4 +25,3 @@ tasks.withType(Test).configureEach {
 spotless {
     java { target 'src/**/*.java'; googleJavaFormat(catalog.findVersion('google-java-format').get().requiredVersion) }
 }
-dependencyLocking { lockAllConfigurations() }
