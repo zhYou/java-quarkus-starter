@@ -1,17 +1,33 @@
 # 本地操作和恢复
 
-`mise run doctor` 检查工具和 Docker。`mise run db:up` 启动 PostgreSQL 并迁移；`mise run sharding:up` 启动一协调两 worker 并迁移。凭据随机产生在 .local/db-single.env 或 db-sharding.env，目录 700、文件 600；不要提交、复制到日志或用于生产。
+所有本地管理操作通过 Gradle Java 任务执行，mise 保留快捷任务名称。`mise run doctor` 检查工具和 Docker；`mise run db:up` 启动并迁移 PostgreSQL；`mise run sharding:up` 启动并迁移一协调两 worker 的 Citus 示例。
 
-`down` 保留卷，下一次 up 继续使用原密码和数据。`mise run db:reset -- --confirm-local-reset` 或 sharding:reset 删除当前项目记录的卷；没有确认、资源归属不符、外部 JDBC URL 或状态文件异常均会拒绝。脚本没有全局 prune。不要删除有数据环境的 .local 文件；它们记录连接凭据和 Compose 归属。
+凭据随机生成在 `.local/db-single.env` 或 `db-sharding.env`，目录权限 700、文件权限 600。已有 Python 工具生成的本地状态格式继续兼容。状态记录连接凭据与 Compose 归属，应保留，不用于生产或复制到日志。
 
-普通库备份：`mise run db:backup -- --output .local/orders.dump`。恢复：`mise run db:restore -- --input .local/orders.dump`，创建独立 single-restore-xxxxxxxx 目标与端口，不更换源环境配置。备份/恢复使用镜像内同版本 pg_dump/pg_restore。
+| 操作 | Gradle 入口 |
+|---|---|
+| 启动并迁移 | `./gradlew dbUp` |
+| 停止并保留数据卷 | `./gradlew dbDown` |
+| 确认删除所选环境的数据卷 | `./gradlew dbReset -PconfirmLocalReset=true` |
+| 对已存在的本地环境迁移 | `./gradlew dbMigrate` |
+| 普通库备份 | `./gradlew dbBackup -Poutput=.local/orders.dump` |
+| 恢复到新环境 | `./gradlew dbRestore -Pinput=.local/orders.dump` |
 
-Citus 示例先停止应用写入，再 `mise run sharding:export -- --output .local/orders.json`；`mise run sharding:restore -- --input .local/orders.json` 新建拓扑、迁移并导入。JSON 仅含本模板 orders；完整校验后才写入，未知版本、损坏输入或非空目标拒绝导入。它不包括角色、扩展、任意业务表或增量日志，不能代替生产备份或 PITR。真实生产备份由选定数据库服务和运维方案提供。
+`-PdbMode=single|sharding` 选择模式，默认 single；`-PdbName=<已记录名称>` 选择已有目标。mise sharding 别名自动传入 sharding 模式。没有确认、归属不符、外部 JDBC URL 或异常状态时拒绝重置；没有全局 prune。
 
-恢复目标名称和配置路径会输出；使用 `python3 scripts/dev.py down --mode single --name single-restore-xxxxxxxx` 停止该目标，reset 加确认删除其卷。失败目标保留诊断，不删除源数据或自动切换源连接。
+普通库使用镜像内同版本 pg_dump/pg_restore。恢复自动创建 single-restore-xxxxxxxx 名称和新端口，不修改源配置。恢复目标名称和配置路径输出到 stderr；使用 `./gradlew dbDown -PdbName=single-restore-xxxxxxxx` 停止该目标，reset 时再加确认属性。
 
-`mise run dev` 运行 HTTP 开发模式；`mise run cli -- --output=json orders list --customer-id <UUID>` 运行 CLI。选择分片配置可直接 `python3 scripts/dev.py cli --mode sharding -- --output=json orders list --customer-id <UUID>`。构建任务始终调用 Wrapper，实际 Java 路径来自 Gradle Toolchain。
+Citus 示例导出前需停止应用写入：
 
-`python3 -m unittest discover -s scripts/tests -v` 验证脚本边界；`./gradlew :server:recoveryTest` 真实验证两种恢复，Citus 源集群停用后再运行目标，最多一套活动分片集群。`shardingCheck` 包含恢复演练。工作区权限不足或 Docker 故障会使测试失败。
+```bash
+mise run sharding:export -- -Poutput=.local/orders.json
+mise run sharding:restore -- -Pinput=.local/orders.json
+```
 
-Compose 调用显式使用所选目标的配置，父 shell 已导出的源环境端口/密码不会覆盖恢复目标。若管理另一个已记录的目标时仍导出了源 APP_DB_JDBC_URL，先 `unset APP_DB_JDBC_URL`；与所选目标不符的外部连接变量仍会使本地管理操作被拒绝。恢复文件必须恰好包含一个完整 JSON 根对象，拼接对象和尾部垃圾会在使用数据库连接前拒绝。
+恢复新建 sharding-restore-xxxxxxxx 拓扑，迁移后导入。JSON 仅用于本模板 orders 示例，不包含角色、扩展、任意业务表或增量日志。未知版本、损坏输入、尾部垃圾和非空目标拒绝导入；不能替代生产备份或 PITR。
+
+Compose 显式使用目标环境配置，父 shell 中已导出的源端口或密码不会覆盖新恢复目标。管理另一个已记录目标时若仍导出源 APP_DB_JDBC_URL，需要先 unset；外部连接与目标不符时，本地操作仍会拒绝。失败目标保留诊断，不删除源数据或切换源连接。
+
+`mise run dev` 启动使用本地配置的 HTTP 开发模式，并关闭自动 DevServices，避免启动未记录归属的附加容器；`./gradlew :server:quarkusDev` 仍可用于显式配置的常规 Quarkus 开发模式，添加 `-PlocalDb=true` 可加载所选本地环境。CLI 参数与退出码见 [CLI 文档](cli.md)。Serena 使用 `mise run serena`，附加参数采用 `--args`。
+
+Java 单元测试和 Gradle TestKit 验证操作边界；`./gradlew shardingCheck` 验证真实分片与两种恢复，`packageCheck` 验证真实 Jar。外部状态操作每次执行；构建内通过共享服务串行修改本地环境，不跳过 Docker 故障。

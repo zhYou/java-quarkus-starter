@@ -1,6 +1,6 @@
 # 兼容性记录
 
-基线日期：2026-10-29。实际验证平台：Linux x86_64，Docker Engine 29.9.1。
+基线日期：2026-10-29。实际验证平台：Linux x86_64，Docker Engine 29.9.1。2026-11-02 的 Groovy/build-logic 和 Java 工具迁移验收见 [验证记录](verification.md#2026-11-02gradle-构建逻辑与开发工具改造)，构建与 CLI 约定见 [Gradle](gradle.md)、[CLI](cli.md)。
 
 | 组件 | 固定选择 | 实际验证 |
 |---|---|---|

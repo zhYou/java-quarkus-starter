@@ -1,0 +1,26 @@
+import io.github.zhyou.starter.buildlogic.LocalDevEnvironment
+
+plugins {
+    id 'starter.java-conventions'
+    id 'io.quarkus'
+}
+dependencies {
+    implementation 'io.quarkus:quarkus-cyclonedx'
+    testImplementation 'io.quarkus:quarkus-junit'
+}
+tasks.register('shardingTest', Test) {
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform { setExcludeTags([] as Set); includeTags 'sharding' }
+    dependsOn tasks.named('testClasses')
+    mustRunAfter tasks.named('test')
+}
+tasks.named('quarkusDev') {
+    notCompatibleWithConfigurationCache('Quarkus 3.40 dev mode retains Configuration and SourceSet objects; local configuration is read per invocation')
+}
+if (gradle.startParameter.taskNames.any { it == 'dev' || it == ':dev' } || providers.gradleProperty('localDb').getOrElse('false') == 'true') {
+    tasks.named('quarkusDev') {
+        environmentVariables.putAll(providers.provider(new LocalDevEnvironment(rootProject.projectDir, providers.gradleProperty('dbMode').getOrElse('single'), providers.gradleProperty('dbName').getOrElse(''))))
+    }
+}

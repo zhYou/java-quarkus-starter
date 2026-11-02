@@ -1,0 +1,8 @@
+plugins { id 'starter.quarkus-application-conventions' }
+dependencies {
+    implementation project(':core')
+    implementation 'io.quarkus:quarkus-picocli'
+    implementation 'io.quarkus:quarkus-jackson'
+    testImplementation testFixtures(project(':core'))
+}
+tasks.named('shardingTest') { mustRunAfter ':server:shardingTest' }

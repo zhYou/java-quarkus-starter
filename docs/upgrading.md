@@ -13,3 +13,5 @@ build/release 包含 CLI 单 Jar、server 完整目录归档、两个 CycloneDX 
 升级 PostgreSQL/Citus 时同时确认扩展、镜像内 PostgreSQL、客户端备份工具和权限。复跑真实物理路由、并发、生命周期、恢复和产物测试。示例版本固定在 Compose 与测试夹具，两处摘要需同步更新。JRE 镜像同样按摘要固定，改变后构建并执行非 root、CLI 和服务退出冒烟。
 
 工具升级修改 mise.toml 后更新 mise.lock，核验工具官方来源及命令。Git 使用发行版维护版本；Serena 只固定包版本，传递依赖完整锁定尚未解决。构建与测试不需要启动 Serena。
+
+构建结构和官方参考见 [Gradle 约定](gradle.md)。included build 具有独立的依赖锁，根校验元数据覆盖整个复合构建；升级时同时解析和验证 buildLogicCheck。Wrapper 重新生成脚本后确认 gradlew.bat 仍为 LF。

@@ -1,0 +1,30 @@
+plugins { id 'starter.quarkus-application-conventions' }
+dependencies {
+    implementation project(':core')
+    implementation 'io.quarkus:quarkus-rest-jackson'
+    implementation 'io.quarkus:quarkus-hibernate-validator'
+    implementation 'io.quarkus:quarkus-smallrye-openapi'
+    implementation 'io.quarkus:quarkus-smallrye-health'
+    implementation 'io.quarkus:quarkus-micrometer-registry-prometheus'
+    implementation 'io.quarkus:quarkus-opentelemetry'
+    implementation 'io.quarkus:quarkus-logging-json'
+    testImplementation 'io.rest-assured:rest-assured'
+    testImplementation testFixtures(project(':core'))
+}
+tasks.register('recoveryTest', Test) {
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform { setExcludeTags([] as Set); includeTags 'recovery' }
+    dependsOn tasks.named('testClasses')
+    mustRunAfter ':cli:shardingTest'
+}
+tasks.register('packageTest', Test) {
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform { setExcludeTags([] as Set); includeTags 'packaged' }
+    systemProperty 'starter.projectRoot', rootProject.projectDir.absolutePath
+    dependsOn tasks.named('testClasses'), ':cli:quarkusBuild', ':server:quarkusBuild'
+    mustRunAfter ':server:recoveryTest'
+}

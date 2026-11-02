@@ -18,47 +18,47 @@ run = "./gradlew check"
 
 [tasks.serena]
 description = "Start the optional Serena MCP server for this project"
-run = "python3 scripts/dev.py serena"
+run = "./gradlew -q --console=plain serena"
 
 [tasks."doctor"]
 description = "Check tools and Docker"
-run = "python3 scripts/dev.py doctor"
+run = "./gradlew doctor"
 
 [tasks."db:up"]
 description = "Start and migrate ordinary PostgreSQL"
-run = "python3 scripts/dev.py up"
+run = "./gradlew dbUp"
 
 [tasks."db:down"]
 description = "Stop ordinary PostgreSQL, retain volume"
-run = "python3 scripts/dev.py down"
+run = "./gradlew dbDown"
 
 [tasks."db:reset"]
 description = "Delete selected local volumes with explicit confirmation"
-run = "python3 scripts/dev.py reset"
+run = "./gradlew dbReset"
 
 [tasks."sharding:up"]
 description = "Start and migrate Citus example"
-run = "python3 scripts/dev.py up --mode sharding"
+run = "./gradlew dbUp -PdbMode=sharding"
 
 [tasks."sharding:down"]
 description = "Stop Citus, retain volumes"
-run = "python3 scripts/dev.py down --mode sharding"
+run = "./gradlew dbDown -PdbMode=sharding"
 
 [tasks."sharding:reset"]
 description = "Delete Citus volumes with explicit confirmation"
-run = "python3 scripts/dev.py reset --mode sharding"
+run = "./gradlew dbReset -PdbMode=sharding"
 
 [tasks."migrate"]
 description = "Apply independent migrations"
-run = "python3 scripts/dev.py migrate"
+run = "./gradlew dbMigrate"
 
 [tasks."dev"]
 description = "Start server development mode"
-run = "python3 scripts/dev.py dev"
+run = "./gradlew dev"
 
 [tasks."cli"]
 description = "Build and execute CLI with Gradle-managed Java"
-run = "python3 scripts/dev.py cli --"
+run = "./gradlew -q --console=plain runCli"
 
 [tasks."sharding:check"]
 description = "Run physical sharding and recovery checks"
@@ -70,16 +70,16 @@ run = "./gradlew packageCheck"
 
 [tasks."db:backup"]
 description = "Dump ordinary PostgreSQL to a new file"
-run = "python3 scripts/dev.py export"
+run = "./gradlew dbBackup"
 
 [tasks."db:restore"]
 description = "Restore dump into a new local target"
-run = "python3 scripts/dev.py restore"
+run = "./gradlew dbRestore"
 
 [tasks."sharding:export"]
 description = "Export quiesced sample orders to a new file"
-run = "python3 scripts/dev.py export --mode sharding"
+run = "./gradlew dbBackup -PdbMode=sharding"
 
 [tasks."sharding:restore"]
 description = "Restore sample into a new Citus topology"
-run = "python3 scripts/dev.py restore --mode sharding"
+run = "./gradlew dbRestore -PdbMode=sharding"

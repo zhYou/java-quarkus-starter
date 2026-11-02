@@ -1,0 +1,26 @@
+plugins {
+    id 'base'
+    id 'starter.local-development'
+    id 'starter.release'
+}
+group = providers.gradleProperty('group').get()
+version = providers.gradleProperty('version').get()
+
+tasks.register('buildLogicCheck') {
+    group = 'verification'
+    description = 'Validate and test the included build plugins'
+    dependsOn gradle.includedBuild('build-logic').task(':check')
+}
+tasks.named('check') { dependsOn ':core:check', ':cli:check', ':server:check', 'buildLogicCheck' }
+tasks.register('spotlessApply') {
+    group = 'formatting'
+    dependsOn ':core:spotlessApply', ':cli:spotlessApply', ':server:spotlessApply', gradle.includedBuild('build-logic').task(':spotlessApply')
+}
+tasks.register('shardingCheck') {
+    group = 'verification'
+    dependsOn ':server:shardingTest', ':cli:shardingTest', ':server:recoveryTest'
+}
+tasks.register('packageCheck') {
+    group = 'verification'
+    dependsOn ':server:packageTest'
+}
