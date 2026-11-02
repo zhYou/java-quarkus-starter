@@ -1,13 +1,22 @@
+# Gradle 缓存与构建产物（包括 build-logic）
 .gradle/
 **/build/
+
+# 本地环境、凭据与备份；示例配置需要提交
 .local/
 .env
 .env.*
 !.env.example
-.superpowers/
+
+# IDE 项目状态
 .idea/
 *.iml
+
+# 智能体工具的本地工作记录与缓存
+.superpowers/
 .serena/cache/
 .serena/memories/
+
+# Python 工具缓存（可选 Serena 等工具仍可能生成）
 __pycache__/
 *.pyc

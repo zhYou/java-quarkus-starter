@@ -1,0 +1,45 @@
+import io.github.zhyou.starter.buildlogic.JavaPathTask
+import io.github.zhyou.starter.buildlogic.SampleArguments
+
+plugins { id 'starter.java-library-conventions' }
+
+dependencies {
+    implementation 'io.quarkus:quarkus-arc'
+    implementation 'jakarta.transaction:jakarta.transaction-api'
+    api 'io.quarkus:quarkus-hibernate-orm'
+    api 'io.quarkus:quarkus-jdbc-postgresql'
+    api 'org.flywaydb:flyway-core'
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+    testFixturesApi enforcedPlatform(libs.quarkus.bom)
+    testFixturesApi 'org.junit.jupiter:junit-jupiter'
+    testFixturesApi 'io.quarkus:quarkus-junit'
+    testFixturesApi 'io.quarkus:quarkus-narayana-jta'
+    testFixturesApi 'org.testcontainers:testcontainers-postgresql'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    testImplementation libs.archunit
+}
+def launcher = javaToolchains.launcherFor(java.toolchain)
+tasks.register('migrate', JavaExec) {
+    group = 'database'
+    description = 'Apply Flyway migrations without starting Quarkus'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'io.github.zhyou.starter.maintenance.MigrationRunner'
+    javaLauncher = launcher
+}
+tasks.register('javaPath', JavaPathTask) { javaExecutable = launcher.map { it.executablePath } }
+[sampleExport: 'export', sampleImport: 'import'].each { taskName, operation ->
+    tasks.register(taskName, JavaExec) {
+        group = 'database'
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = 'io.github.zhyou.starter.maintenance.SampleDataTransfer'
+        javaLauncher = launcher
+        def arguments = objects.newInstance(SampleArguments)
+        arguments.operation = operation
+        arguments.dataFile = providers.gradleProperty('dataFile')
+        argumentProviders.add(arguments)
+    }
+}
+tasks.named('processTestFixturesResources') {
+    from(rootProject.layout.projectDirectory.file('infra/citus/init/002_topology.sql')) { rename { 'citus-topology.sql' } }
+}

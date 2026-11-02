@@ -17,3 +17,5 @@ CLI offline preflight 不启动 Quarkus；业务执行启用 CDI 请求上下文
 Quarkus BOM 与插件共用 gradle/libs.versions.toml 版本，保持 LTS 主线。依赖变更更新锁和 SHA-256 元数据，并重新跑相关真实测试。产物、CI、部署和文档中的命令要能复现。清单只暴露业务 Service，管理端口仅内部探针/指标。发布、推送、云资源操作按用户授权执行。
 
 设计和计划位于 docs/superpowers。提交前检查差异、忽略规则和相关验证结果；凭据、本地状态、缓存和构建产物不得提交。推送或远端发布须有用户授权。
+
+构建逻辑采用 build-logic included build：Groovy convention plugins 复用配置，Java 实现复杂任务；模块显式应用插件，不使用 allprojects/subprojects/afterEvaluate 注入公共配置。遵循 [Gradle 构建约定与官方资料](docs/gradle.md)；CLI 设计参考 [项目 CLI 约定](docs/cli.md) 与 https://clig.dev/，保留 Jar 的输出及退出码契约。

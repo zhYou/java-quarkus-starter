@@ -19,10 +19,8 @@ Git 通过 mise bootstrap 使用宿主包管理器维护：`mise bootstrap packa
 运行 CLI：
 
 ```bash
-mise run cli -- --output=json orders create \
-  --customer-id 00000000-0000-0000-0000-000000000001 --description 'first order'
-mise run cli -- --output=json orders list \
-  --customer-id 00000000-0000-0000-0000-000000000001
+mise run cli -- --args="--output=json orders create --customer-id 00000000-0000-0000-0000-000000000001 --description 'first order'"
+mise run cli -- --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
 mise run dev
 ```
 
@@ -41,15 +39,15 @@ API 的读取/完成始终需要 customerId 与 id。当前示例未实现认证
 
 ```bash
 mise run sharding:up
-python3 scripts/dev.py cli --mode sharding -- --output=json orders list \
-  --customer-id 00000000-0000-0000-0000-000000000001
+./gradlew -q --console=plain runCli -PdbMode=sharding \
+  --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
 ./gradlew shardingCheck
 ./gradlew packageCheck
 ```
 
 | 入口 | 验证范围 |
 |---|---|
-| `./gradlew check` | 格式、编译器静态检查、领域边界、业务、普通 PostgreSQL、Python 操作边界 |
+| `./gradlew check` | 格式、编译器静态检查、领域边界、业务、普通 PostgreSQL、构建逻辑与本地操作边界 |
 | `./gradlew shardingCheck` | 真实 Citus 节点路由、仓储、CLI、重启和两种恢复 |
 | `./gradlew packageCheck` | Java 25 启动真实 Jar，CLI/API 互通、离线帮助、错误 JSON、健康故障和退出 |
 | `./gradlew assembleRelease` | 两种产物、CycloneDX SBOM、源码标识与 SHA-256 校验，保存在 build/release |
@@ -72,13 +70,15 @@ java -jar server/build/quarkus-app/quarkus-run.jar
 
 迁移独立于 Quarkus 启动：`./gradlew :core:migrate`，从 APP_DB_MODE=single|sharding、APP_DB_JDBC_URL、APP_DB_MIGRATION_USERNAME、APP_DB_MIGRATION_PASSWORD 取值。正常应用只校验 schema。CLI 成功/输入/缺失/冲突/内部错误退出码分别为 0/2/3/4/1；`--output=json` 标准输出保持一个 JSON 值。
 
-`mise run db:down`、`mise run sharding:down` 保留数据卷；reset 必须显式加 `--confirm-local-reset`。本地凭据、状态和备份在受忽略的 .local 中，保留状态文件才能安全管理已有环境。
+`mise run db:down`、`mise run sharding:down` 保留数据卷；reset 必须显式加 `-PconfirmLocalReset=true`。本地凭据、状态和备份在受忽略的 .local 中，保留状态文件才能安全管理已有环境。
 
 ## 维护资料
+
+- [Gradle 构建约定与官方资料](docs/gradle.md)、[CLI 使用与设计](docs/cli.md)
 
 - [数据库与迁移](docs/database.md)、[分片限制](docs/sharding.md)、[API](docs/api.md)
 - [操作与恢复](docs/operations.md)、[云部署](docs/cloud-deployment.md)、[数据库路线与成本](docs/database-options.md)
 - [升级与回退](docs/upgrading.md)、[扩展与 Serena](docs/extensions.md)、[实际兼容记录](docs/compatibility.md)、[验证与审阅记录](docs/verification.md)
-- [智能体约定](AGENTS.md)、[已批准设计](docs/superpowers/specs/2026-10-29-java-quarkus-starter-design.md)
+- [智能体约定](AGENTS.md)、[初版设计](docs/superpowers/specs/2026-10-29-java-quarkus-starter-design.md)、[构建改造设计](docs/superpowers/specs/2026-11-02-gradle-build-logic-design.md)
 
 发布工作流只归档验证后的产物；当前未执行远端发布、真实云部署或生产 HA 验证。许可证待项目维护者确定。

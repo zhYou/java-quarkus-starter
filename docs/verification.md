@@ -62,3 +62,31 @@ Serena 的 Python 传递依赖未完整锁定，Java LSP 交互未完整验收�
 首次 GitHub CI 在插件 classpath 解析阶段暴露 16 个缺失的校验条目：4 个父 POM、12 个 JUnit BOM module 文件。它们不是现有摘要不匹配，而是热缓存生成时没有被完整记录。修复时刷新完整依赖解析，并从 Maven Central 独立下载、核对新增摘要；严格依赖校验保持开启。后续依赖升级沿用冷缓存验证，避免只依赖本机历史缓存。
 
 最终补齐 25 个元数据文件的 SHA-256，全部与 Maven Central 独立下载结果一致，原有摘要与校验策略未变。刷新依赖后 check/shardingCheck/packageCheck 通过；使用独立 Gradle 用户目录、关闭配置缓存且无共享依赖缓存的 help 解析通过（仅复用 Wrapper 分发包及已有引导 JDK），覆盖首次 CI 失败的插件 classpath 路径。
+
+## 2026-11-02：Gradle 构建逻辑与开发工具改造
+
+构建入口已转换为 Groovy DSL，公共约定位于 build-logic，原项目 Python 工具和测试由 Java/Gradle 接手。CLI 业务命令与直接 Jar 的退出码保持不变；Gradle 便捷入口采用 Gradle 失败语义。
+
+完整组合命令：
+
+```bash
+./gradlew check shardingCheck packageCheck assembleRelease \
+  --rerun-tasks --no-build-cache --offline --console=plain
+```
+
+结果 BUILD SUCCESSFUL，3 分 12 秒，70 个任务全部执行。构建逻辑包含 16 个 Java/TestKit 测试，覆盖本地状态与权限、资源选择、恢复隔离、发布摘要、真实编译告警、配置缓存和 Serena 进程边界。
+
+额外验证：
+
+- 使用全新独立 Gradle 用户目录，只复用已验证的 Wrapper 分发包和 Gradle 管理的 JDK，执行 help/buildLogicCheck；严格依赖校验下 24 个任务全部执行成功。TestKit 跟随调用者的 offline 设置，夹具使用根 SHA-256 校验策略。
+- 新增的 11 个依赖摘要分别从 Maven Central 独立下载核对；没有修改或删除原有摘要。
+- 连续两次执行 `:core:clean :core:compileJava`，第二次复用配置缓存且 compileJava 为 FROM-CACHE；连续查询 `:core:javaPath` 返回相同的受管启动器。
+- 使用旧 Python Controller 格式创建隔离状态，真实执行 dbUp、CLI 写入/查询、私有 pg_dump、导出源 APP_DB_* 后恢复到新目标、目标数据对比、源凭据稳定性、down/up 保留数据；临时目标仅通过所属 Compose 显式重置并清理。
+- 本地 dev 连接所选数据库并通过 readiness 检查，关闭自动 DevServices 后不启动额外的可观测性容器；测试进程和临时数据库均已清理。
+- Serena 使用私有可执行文件验证 stdin/stdout JSON 往返，stdout 精确匹配且 stderr 为空；TestKit 另验证 Java 25、带空格参数、重复缓存调用和无需数据库状态。未宣称完成真实 Serena Java LSP 全流程验收。
+- 独立计算现存 Git 管理源文件的摘要，与 SOURCE.json 一致；核对发布目录的 5 个 SHA-256 条目、完整 server 归档和两份非空 CycloneDX SBOM。
+- actionlint、Kubernetes kubeconform、18 个 mise 任务配置、忽略规则和 LF 审计通过。
+
+审阅和集成验证发现的问题均先复现再修复：状态文件必须与请求的 mode/name 一致；Quarkus 开发任务需要在输入定型前延迟加载环境，并单独退出配置缓存；同模块普通/分片 HTTP 测试必须按顺序运行以避免争用 8081。修复后的完整组合命令已通过。
+
+原有上游 OpenTelemetry API usage、指标重复注册、依赖 about.html 重复和 SBOM 许可证字段提示仍保留，没有隐藏警告或跳过 Docker 测试。本次只记录 Mandrel 25 的原生构建方式，不新增或宣称验收 Native 发布流水线。生产备份仍不属于示例 JSON 恢复能力。

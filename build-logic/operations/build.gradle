@@ -1,0 +1,22 @@
+plugins {
+    id 'java-gradle-plugin'
+    alias(libs.plugins.spotless)
+}
+java { toolchain { languageVersion = JavaLanguageVersion.of(25); vendor = JvmVendorSpec.ADOPTIUM } }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.compilerArgs.addAll(['-Xlint:all', '-Werror']) }
+tasks.withType(Test).configureEach { useJUnitPlatform(); maxParallelForks = 1 }
+spotless { java { target 'src/**/*.java'; googleJavaFormat(libs.versions.google.java.format.get()) } }
+dependencyLocking { lockAllConfigurations() }
+dependencies {
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.launcher
+    testImplementation gradleTestKit()
+    implementation libs.jackson.databind
+}
+gradlePlugin {
+    plugins {
+        localDevelopment { id = 'starter.local-development'; implementationClass = 'io.github.zhyou.starter.buildlogic.LocalDevelopmentPlugin' }
+        release { id = 'starter.release'; implementationClass = 'io.github.zhyou.starter.buildlogic.ReleasePlugin' }
+    }
+}
+tasks.named('test') { systemProperty 'starter.gradleUserHome', gradle.gradleUserHomeDir.absolutePath }
