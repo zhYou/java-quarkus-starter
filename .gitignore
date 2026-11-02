@@ -2,6 +2,12 @@
 .gradle/
 **/build/
 
+# 不再维护的版本锁与依赖校验生成文件
+gradle.lockfile
+settings-gradle.lockfile
+/mise.lock
+/gradle/verification-metadata.xml
+
 # 本地环境、凭据与备份；示例配置需要提交
 .local/
 .env

@@ -14,8 +14,6 @@ public final class ReleaseFiles {
           "README.md",
           "AGENTS.md",
           "gradle.properties",
-          "gradle.lockfile",
-          "settings-gradle.lockfile",
           "settings.gradle",
           "build.gradle",
           "gradlew",
@@ -23,7 +21,6 @@ public final class ReleaseFiles {
           "gradle",
           "build-logic",
           "mise.toml",
-          "mise.lock",
           ".editorconfig",
           ".gitignore",
           ".dockerignore",
@@ -58,7 +55,12 @@ public final class ReleaseFiles {
               .filter(Files::isRegularFile)
               .filter(
                   p -> {
-                    for (Path part : root.relativize(p))
+                    Path relative = root.relativize(p);
+                    if (Set.of("gradle.lockfile", "settings-gradle.lockfile")
+                            .contains(p.getFileName().toString())
+                        || relative.equals(Path.of("gradle", "verification-metadata.xml")))
+                      return false;
+                    for (Path part : relative)
                       if (Set.of("build", ".gradle", ".local", "__pycache__")
                           .contains(part.toString())) return false;
                     return true;

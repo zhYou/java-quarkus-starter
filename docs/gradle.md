@@ -8,7 +8,7 @@
 - [官方用户手册](https://docs.gradle.org/current/userguide/userguide.html)、[本项目版本手册](https://docs.gradle.org/9.8.2/userguide/userguide.html)
 - [构建组织与 build-logic](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html)、[Composite Builds](https://docs.gradle.org/current/userguide/composite_builds.html)
 - [Convention Plugins](https://docs.gradle.org/current/userguide/pre_compiled_script_plugin_advanced.html)、[Groovy DSL](https://docs.gradle.org/current/userguide/groovy_build_script_primer.html)、[Java API](https://docs.gradle.org/current/javadoc/)
-- [版本目录](https://docs.gradle.org/current/userguide/version_catalogs.html)、[依赖锁定](https://docs.gradle.org/current/userguide/dependency_locking.html)、[依赖校验](https://docs.gradle.org/current/userguide/dependency_verification.html)
+- [版本目录](https://docs.gradle.org/current/userguide/version_catalogs.html)
 - [构建性能](https://docs.gradle.org/current/userguide/performance.html)、[配置缓存要求](https://docs.gradle.org/current/userguide/configuration_cache_requirements.html)、[TestKit](https://docs.gradle.org/current/userguide/test_kit.html)
 
 `current` 用于了解最新建议；实施时以 Wrapper 版本的 API 和兼容验证为准。官方通用建议偏好 Kotlin DSL，本项目按维护者的明确选择使用 Groovy DSL。
@@ -19,7 +19,7 @@
 
 | 插件项目 | 插件 | 职责 |
 |---|---|---|
-| conventions | starter.java-conventions | JDK、编译器、JUnit、Spotless、Quarkus BOM、依赖锁定 |
+| conventions | starter.java-conventions | JDK、编译器、JUnit、Spotless、Quarkus BOM |
 | conventions | starter.java-library-conventions | 公共 Java 约定、Java Library 与 Test Fixtures，供 core 使用 |
 | conventions | starter.quarkus-application-conventions | 公共 Java 约定、Quarkus、SBOM、分片测试，供 cli/server 使用 |
 | operations | starter.local-development | 本地环境、开发运行和 Serena；复杂逻辑使用 Java |
@@ -29,7 +29,7 @@
 
 版本目录由主构建和 included build 显式共享。外部插件在 conventions 的依赖中通过目录别名解析；预编译插件内按插件 ID 应用。构建逻辑自身的 Java 测试和格式设置写在其构建脚本中，避免插件自举依赖循环。
 
-`buildLogicCheck` 校验两个插件项目，根 `check` 包含该任务。TestKit 使用独立临时项目、共享依赖缓存，遵循调用者的 offline 设置并使用根依赖校验策略；根 `spotlessApply` 同时格式化插件代码和应用代码。依赖校验由根 `gradle/verification-metadata.xml` 覆盖整个复合构建，各项目分别保存自己的依赖锁。
+`buildLogicCheck` 校验两个插件项目，根 `check` 包含该任务。TestKit 使用独立临时项目、共享依赖缓存，遵循调用者的 offline 设置；根 `spotlessApply` 同时格式化插件代码和应用代码。依赖版本由版本目录与 Quarkus BOM 管理，主构建和 included build 均不维护依赖锁或校验元数据。
 
 ## 缓存与任务边界
 

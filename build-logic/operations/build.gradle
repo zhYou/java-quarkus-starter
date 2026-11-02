@@ -6,7 +6,6 @@ java { toolchain { languageVersion = JavaLanguageVersion.of(25); vendor = JvmVen
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.compilerArgs.addAll(['-Xlint:all', '-Werror']) }
 tasks.withType(Test).configureEach { useJUnitPlatform(); maxParallelForks = 1 }
 spotless { java { target 'src/**/*.java'; googleJavaFormat(libs.versions.google.java.format.get()) } }
-dependencyLocking { lockAllConfigurations() }
 dependencies {
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.launcher

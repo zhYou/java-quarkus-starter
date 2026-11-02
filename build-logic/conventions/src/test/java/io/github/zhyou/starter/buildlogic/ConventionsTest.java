@@ -28,11 +28,6 @@ class ConventionsTest {
     var args = new ArrayList<>(List.of(arguments));
     if (Boolean.getBoolean("starter.offline")) args.add("--offline");
     args.addAll(List.of("-g", System.getProperty("starter.gradleUserHome")));
-    Files.createDirectories(root.resolve("gradle"));
-    Files.copy(
-        Path.of(System.getProperty("starter.repository"), "gradle/verification-metadata.xml"),
-        root.resolve("gradle/verification-metadata.xml"),
-        StandardCopyOption.REPLACE_EXISTING);
     return GradleRunner.create()
         .withProjectDir(root.toFile())
         .withPluginClasspath()

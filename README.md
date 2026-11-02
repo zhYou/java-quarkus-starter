@@ -14,7 +14,7 @@ mise run db:up
 ./gradlew check
 ```
 
-Git 通过 mise bootstrap 使用宿主包管理器维护：`mise bootstrap packages status` 检查，确需安装时执行 `mise bootstrap packages apply`。其版本接受发行版维护版本；其他辅助工具固定在 mise.toml/mise.lock。Serena 可选，构建无需 MCP。
+Git 通过 mise bootstrap 使用宿主包管理器维护：`mise bootstrap packages status` 检查，确需安装时执行 `mise bootstrap packages apply`。其版本接受发行版维护版本；其他辅助工具在 mise.toml 声明精确版本，项目关闭锁文件。Serena 可选，构建无需 MCP。
 
 运行 CLI：
 
