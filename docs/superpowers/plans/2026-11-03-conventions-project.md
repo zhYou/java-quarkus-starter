@@ -10,4 +10,6 @@
 - [x] 更新构建说明、README 与 AGENTS，记录替代关系。
 - [x] 验证 conventions 子项目入口、格式化和根聚合检查。
 - [x] 串行运行 check、shardingCheck、packageCheck、assembleRelease，核对产物校验与源码标识。
-- [ ] 提交并完成一次独立审阅，推送后创建面向 main 的后续 PR，保留 worktree。
+- [x] 提交并完成一次独立审阅，推送后创建面向 main 的后续 PR，保留 worktree。
+
+交付：[PR #8](https://github.com/zhYou/java-quarkus-starter/pull/8)。完整测试及独立审阅均通过，详见[验证记录](../../verification.md)。

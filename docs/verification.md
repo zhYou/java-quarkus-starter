@@ -123,3 +123,5 @@ convention 脚本及其 Java 辅助类、测试上移至 build-logic 根项目�
 再次执行 `./gradlew check shardingCheck packageCheck assembleRelease --rerun-tasks --no-build-cache --console=plain`，结果 BUILD SUCCESSFUL，2 分 36 秒，70 个任务全部执行。conventions、operations 和三个业务模块的有效测试报告合计 62 项，失败、错误和跳过均为 0；真实 Citus、两种恢复、Jar 进程和归档均通过。另核对 5 个发布文件的 SHA-256、完整 server 运行时目录及两份非空 CycloneDX SBOM。
 
 验证仍使用环境提供的 Temurin 25，平台为 Linux/WSL2 x86_64；原生 Windows、Native Image 和完整 Serena Java LSP 流程的未验收边界沿用上一轮。
+
+独立只读审阅覆盖 `ea3882f..bbcabdb`，未发现 Critical、Important 或 Minor 问题；未重复运行上述测试，也没有搁置的行为判断。交付为 [PR #8](https://github.com/zhYou/java-quarkus-starter/pull/8)，分支 `refactor/261103-conventions-project`，保留隔离 worktree 供审查。
