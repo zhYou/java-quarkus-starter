@@ -30,5 +30,7 @@
 - [x] 确认 Gradle 与 javaPath 使用 Temurin 25。
 - [x] 串行执行 check、shardingCheck、packageCheck、assembleRelease，并检查 SHA256SUMS。
 - [x] 记录验证结果及限制，审查差异、忽略规则和工作区内容。
-- [ ] 提交后完成一次独立审阅，处理实质性问题，按改动范围补充验证。
-- [ ] 推送任务分支并创建面向 main 的 PR，报告链接、验证结果、分支与 worktree。
+- [x] 提交后完成一次独立审阅，处理实质性问题，按改动范围补充验证。
+- [x] 推送任务分支并创建面向 main 的 PR，报告链接、验证结果、分支与 worktree。
+
+交付：[PR #7](https://github.com/zhYou/java-quarkus-starter/pull/7)。完整验证与审阅结论见 [验证记录](../../verification.md#2026-11-03构建配置与命令入口精简)。
