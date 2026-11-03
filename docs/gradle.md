@@ -15,21 +15,21 @@
 
 ## 组织与职责
 
-`build-logic` 是通过 `pluginManagement.includeBuild` 接入的独立构建。预编译约定直接位于根项目的 `src/main/groovy`，辅助 Java 类与测试同样放在根项目的源码目录；复杂维护插件保留在 `operations` 子项目。
+`build-logic` 是通过 `pluginManagement.includeBuild` 接入的独立构建。`conventions` 子项目承载 `src/main/groovy` 中的预编译约定，以及相关 Java 辅助类和测试；`operations` 子项目承载复杂维护插件。build-logic 根项目只聚合两者的检查和格式化任务。
 
 | 插件项目 | 插件 | 职责 |
 |---|---|---|
-| 根项目 | java-conventions | JDK、编译器、JUnit、Spotless、Quarkus BOM |
-| 根项目 | library-conventions | 公共 Java 约定、Java Library 与 Test Fixtures，供 core 使用 |
-| 根项目 | application-conventions | 公共 Java 约定、Quarkus、SBOM、分片测试，供 cli/server 使用 |
+| conventions | java-conventions | JDK、编译器、JUnit、Spotless、Quarkus BOM |
+| conventions | library-conventions | 公共 Java 约定、Java Library 与 Test Fixtures，供 core 使用 |
+| conventions | application-conventions | 公共 Java 约定、Quarkus、SBOM、分片测试，供 cli/server 使用 |
 | operations | starter.local-development | 本地环境、开发运行和 Serena；复杂逻辑使用 Java |
 | operations | starter.release | 发布归档、源码标识、校验文件；不执行发布 |
 
 模块脚本显式应用约定插件，保留业务依赖与模块专有任务。根项目只组织聚合任务。共享配置不通过 `allprojects`、`subprojects` 或 `afterEvaluate` 注入。
 
-版本目录由主构建和 included build 显式共享。外部插件在 build-logic 根项目的依赖中通过目录别名解析；预编译插件内按插件 ID 应用。构建逻辑自身的 Java 测试和格式设置写在其构建脚本中，避免插件自举依赖循环。主构建的 group、version 由 gradle.properties 自动设置。
+版本目录由主构建和 included build 显式共享。外部插件在 conventions 的依赖中通过目录别名解析；预编译插件内按插件 ID 应用。conventions 依赖 operations 提供的本地环境支持，operations 不反向依赖 conventions。构建逻辑自身的 Java 测试和格式设置写在其构建脚本中，避免插件自举依赖循环。主构建的 group、version 由 gradle.properties 自动设置。
 
-`buildLogicCheck` 校验 build-logic 根项目与 operations，主构建的 `check` 包含该任务。TestKit 使用独立临时项目、共享依赖缓存，遵循调用者的 offline 设置；根 `spotlessApply` 同时格式化插件代码和应用代码。依赖版本由版本目录与 Quarkus BOM 管理，主构建和 included build 均不维护依赖锁或校验元数据。
+`buildLogicCheck` 通过 build-logic 根项目校验 conventions 与 operations，主构建的 `check` 包含该任务。TestKit 使用独立临时项目、共享依赖缓存，遵循调用者的 offline 设置；根 `spotlessApply` 同时格式化插件代码和应用代码。依赖版本由版本目录与 Quarkus BOM 管理，主构建和 included build 均不维护依赖锁或校验元数据。
 
 ## 缓存与任务边界
 

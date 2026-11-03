@@ -2,6 +2,8 @@
 
 用户于 2026-11-03 确认实施；本设计取代此前设计中的 conventions 子项目、Daemon JVM criteria 和 mise 任务别名安排。
 
+后续用户决定恢复独立的 conventions 子项目，组织方式以[后续设计](2026-11-03-conventions-project-design.md)为准；其余精简决定继续有效。
+
 - `build-logic` 根项目直接承载 Groovy 预编译约定和辅助 Java 类，保留 `operations` 子项目。
 - 约定 ID 使用 `java-conventions`、`library-conventions`、`application-conventions`；后两者复用前者，Application 继续配置 Quarkus。
 - 删除 `gradle-daemon-jvm.properties`。环境提供运行 Gradle 的 Temurin 25，业务模块通过公共约定和 Foojay resolver 管理 Java 25/Temurin Toolchain。

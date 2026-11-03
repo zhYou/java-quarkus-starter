@@ -81,6 +81,6 @@ java -jar server/build/quarkus-app/quarkus-run.jar
 - [数据库与迁移](docs/database.md)、[分片限制](docs/sharding.md)、[API](docs/api.md)
 - [操作与恢复](docs/operations.md)、[云部署](docs/cloud-deployment.md)、[数据库路线与成本](docs/database-options.md)
 - [升级与回退](docs/upgrading.md)、[扩展与 Serena](docs/extensions.md)、[实际兼容记录](docs/compatibility.md)、[验证与审阅记录](docs/verification.md)
-- [智能体约定](AGENTS.md)、[初版设计](docs/superpowers/specs/2026-10-29-java-quarkus-starter-design.md)、[构建精简设计](docs/superpowers/specs/2026-11-03-simplify-gradle-design.md)
+- [智能体约定](AGENTS.md)、[初版设计](docs/superpowers/specs/2026-10-29-java-quarkus-starter-design.md)、[构建组织设计](docs/superpowers/specs/2026-11-03-conventions-project-design.md)
 
 发布工作流只归档验证后的产物；当前未执行远端发布、真实云部署或生产 HA 验证。许可证待项目维护者确定。

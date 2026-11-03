@@ -18,7 +18,7 @@ Quarkus BOM 与插件共用 gradle/libs.versions.toml 版本，保持 LTS 主线
 
 设计和计划位于 docs/superpowers。提交前检查差异、忽略规则和相关验证结果；凭据、本地状态、缓存和构建产物不得提交。任务分支的提交、推送和 PR 按下文交付流程执行。
 
-构建逻辑采用 build-logic included build：Groovy convention plugins 复用配置，Java 实现复杂任务；模块显式应用插件，不使用 allprojects/subprojects/afterEvaluate 注入公共配置。遵循 [Gradle 构建约定与官方资料](docs/gradle.md)；CLI 设计参考 [项目 CLI 约定](docs/cli.md) 与 https://clig.dev/，保留 Jar 的输出及退出码契约。
+构建逻辑采用 build-logic included build：conventions 管 Groovy convention plugins 及辅助类，operations 用 Java 实现复杂维护任务，根项目聚合检查与格式化；模块显式应用插件，不使用 allprojects/subprojects/afterEvaluate 注入公共配置。遵循 [Gradle 构建约定与官方资料](docs/gradle.md)；CLI 设计参考 [项目 CLI 约定](docs/cli.md) 与 https://clig.dev/，保留 Jar 的输出及退出码契约。
 
 ## 隔离开发与交付
 

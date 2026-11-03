@@ -1,5 +1,5 @@
 pluginManagement { repositories { gradlePluginPortal(); mavenCentral() } }
-include 'operations'
+include 'conventions', 'operations'
 dependencyResolutionManagement {
     repositories { mavenCentral(); gradlePluginPortal() }
     versionCatalogs { libs { from(files('../gradle/libs.versions.toml')) } }
