@@ -1,4 +1,4 @@
-plugins { id 'starter.quarkus-application-conventions' }
+plugins { id 'application-conventions' }
 dependencies {
     implementation project(':core')
     implementation 'io.quarkus:quarkus-picocli'

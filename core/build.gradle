@@ -1,7 +1,7 @@
 import io.github.zhyou.starter.buildlogic.JavaPathTask
 import io.github.zhyou.starter.buildlogic.SampleArguments
 
-plugins { id 'starter.java-library-conventions' }
+plugins { id 'library-conventions' }
 
 dependencies {
     implementation 'io.quarkus:quarkus-arc'
@@ -19,21 +19,18 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     testImplementation libs.archunit
 }
-def launcher = javaToolchains.launcherFor(java.toolchain)
 tasks.register('migrate', JavaExec) {
     group = 'database'
     description = 'Apply Flyway migrations without starting Quarkus'
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'io.github.zhyou.starter.maintenance.MigrationRunner'
-    javaLauncher = launcher
 }
-tasks.register('javaPath', JavaPathTask) { javaExecutable = launcher.map { it.executablePath } }
+tasks.register('javaPath', JavaPathTask) { javaExecutable = javaToolchains.launcherFor(java.toolchain).map { it.executablePath } }
 [sampleExport: 'export', sampleImport: 'import'].each { taskName, operation ->
     tasks.register(taskName, JavaExec) {
         group = 'database'
         classpath = sourceSets.main.runtimeClasspath
         mainClass = 'io.github.zhyou.starter.maintenance.SampleDataTransfer'
-        javaLauncher = launcher
         def arguments = objects.newInstance(SampleArguments)
         arguments.operation = operation
         arguments.dataFile = providers.gradleProperty('dataFile')

@@ -10,4 +10,4 @@ Redis、MQ、对象存储、云 SDK 通过 application 接口和单独适配包�
 
 复杂前端单建 Node 工程和独立构建/发布流程；未使用前不添加 Node 工具链。Native Image 需独立建立兼容和产物测试，不把 JVM 通过当作原生产物验证。
 
-辅助工具由 mise 管理。Serena 包固定为 PyPI serena-agent 2.1.0；`mise run serena` 调用 Gradle Java 任务启动 stdio MCP，并用 Toolchain 的 Java 25 设置子进程 JAVA_HOME；不需要先创建数据库本地状态。首次运行可获取 Gradle JDK；不修改全局 Java 或 MCP。构建和 CI 不要求 Serena 启动。mise 锁中 Serena 仅固定包版本，未完整锁定其 Python 传递依赖，这是当前工具供应链限制。
+辅助工具由 mise 管理。Serena 包固定为 PyPI serena-agent 2.1.0；在已激活辅助工具环境的终端运行 `./gradlew -q --console=plain serena` 启动 stdio MCP，子进程 JAVA_HOME 复用运行 Gradle 的 Temurin 25；不需要先创建数据库本地状态。JDK 由环境提供，不修改全局 Java 或 MCP。构建和 CI 不要求 Serena 启动。项目只固定 Serena 包版本，未完整锁定其 Python 传递依赖，这是当前工具供应链限制。

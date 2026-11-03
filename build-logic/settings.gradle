@@ -1,6 +1,5 @@
 pluginManagement { repositories { gradlePluginPortal(); mavenCentral() } }
-rootProject.name = 'build-logic'
-include 'conventions', 'operations'
+include 'operations'
 dependencyResolutionManagement {
     repositories { mavenCentral(); gradlePluginPortal() }
     versionCatalogs { libs { from(files('../gradle/libs.versions.toml')) } }

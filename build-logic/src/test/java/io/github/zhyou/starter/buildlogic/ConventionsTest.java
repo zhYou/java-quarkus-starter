@@ -21,8 +21,7 @@ class ConventionsTest {
         "rootProject.name='fixture'\ndependencyResolutionManagement { repositories { mavenCentral() }; versionCatalogs { libs { from(files('"
             + catalog
             + "')) } } }");
-    Files.writeString(
-        root.resolve("build.gradle"), "plugins { id 'starter.java-library-conventions' }\n");
+    Files.writeString(root.resolve("build.gradle"), "plugins { id 'library-conventions' }\n");
     var env = new HashMap<>(System.getenv());
     env.put("JAVA_HOME", System.getProperty("java.home"));
     var args = new ArrayList<>(List.of(arguments));

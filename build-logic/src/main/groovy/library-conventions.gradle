@@ -1,5 +1,5 @@
 plugins {
-    id 'starter.java-conventions'
+    id 'java-conventions'
     id 'java-library'
     id 'java-test-fixtures'
 }

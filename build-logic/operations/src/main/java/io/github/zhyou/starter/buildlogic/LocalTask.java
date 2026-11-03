@@ -124,7 +124,10 @@ public abstract class LocalTask extends DefaultTask {
             null,
             null);
         run(List.of("docker", "compose", "version"), System.getenv(), null, null);
-        System.out.println("Tools and Docker ready. Project JDK: Gradle-managed Temurin 25.");
+        System.out.println(
+            "Tools and Docker ready. Project JDK: "
+                + System.getProperty("java.version")
+                + " from the Gradle runtime.");
         return;
       }
       if (operation.equals("serena")) {

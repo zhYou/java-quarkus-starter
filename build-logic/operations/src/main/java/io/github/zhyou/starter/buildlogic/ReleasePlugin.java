@@ -21,8 +21,6 @@ public final class ReleasePlugin implements Plugin<Project> {
                       .set(project.getLayout().getBuildDirectory().dir("release-staging"));
                   task.getArchiveFileName().set("starter-server-" + version + ".tar.gz");
                   task.setCompression(Compression.GZIP);
-                  task.setPreserveFileTimestamps(false);
-                  task.setReproducibleFileOrder(true);
                   task.from(
                       project.getLayout().getProjectDirectory().dir("server/build/quarkus-app"),
                       copy -> copy.into("quarkus-app"));
@@ -34,7 +32,7 @@ public final class ReleasePlugin implements Plugin<Project> {
                 "stageRelease",
                 Sync.class,
                 task -> {
-                  task.dependsOn(":cli:quarkusBuild", server);
+                  task.dependsOn(":cli:quarkusBuild");
                   task.into(release);
                   task.from(
                       project

@@ -19,7 +19,7 @@ java -jar cli/build/starter-cli-runner.jar --output=json orders list \
 本地开发便捷入口自动构建 Jar，并读取选定的项目私有配置：
 
 ```bash
-mise run cli -- --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
+./gradlew -q --console=plain runCli --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
 ./gradlew -q --console=plain runCli -PdbMode=sharding \
   --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
 ```
