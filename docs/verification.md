@@ -113,3 +113,13 @@ convention 脚本及其 Java 辅助类、测试上移至 build-logic 根项目�
 本次验证环境为 Linux/WSL2 x86_64，原生 Windows、Native Image 和真实 Serena Java LSP 全流程未验收。既有上游遥测、重复资源和 SBOM 许可证提示未隐藏。
 
 独立审阅覆盖 `93486fe..cce3b41` 的完整差异，未发现 Critical、Important 或 Minor 问题。审阅只读核对代码、文档和 Gradle 默认行为，未重复执行上述测试。交付为 [PR #7](https://github.com/zhYou/java-quarkus-starter/pull/7)，任务分支 `build/261103-simplify-gradle`；工作区保留用于审查，未执行合并。
+
+## 2026-11-03：恢复 conventions 子项目
+
+按用户后续决定，将三个约定插件、Java 辅助类和测试整体移回 conventions，8 个文件内容逐字节保持一致；build-logic 根项目只聚合 conventions、operations 的检查和格式化任务。此前插件命名、JDK 前提、源码 UTF-8、默认配置和直接 Wrapper 入口继续沿用。组织方式以[后续设计](superpowers/specs/2026-11-03-conventions-project-design.md)为准。
+
+调整前 buildLogicCheck 基线通过，`:build-logic:conventions:check` 因项目不存在而失败；调整后子项目入口及 buildLogicCheck 均通过（6 秒），根 spotlessApply 通过（1 秒）。
+
+再次执行 `./gradlew check shardingCheck packageCheck assembleRelease --rerun-tasks --no-build-cache --console=plain`，结果 BUILD SUCCESSFUL，2 分 36 秒，70 个任务全部执行。conventions、operations 和三个业务模块的有效测试报告合计 62 项，失败、错误和跳过均为 0；真实 Citus、两种恢复、Jar 进程和归档均通过。另核对 5 个发布文件的 SHA-256、完整 server 运行时目录及两份非空 CycloneDX SBOM。
+
+验证仍使用环境提供的 Temurin 25，平台为 Linux/WSL2 x86_64；原生 Windows、Native Image 和完整 Serena Java LSP 流程的未验收边界沿用上一轮。
