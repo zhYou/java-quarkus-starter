@@ -1,4 +1,4 @@
-plugins { id 'starter.quarkus-application-conventions' }
+plugins { id 'application-conventions' }
 dependencies {
     implementation project(':core')
     implementation 'io.quarkus:quarkus-rest-jackson'
@@ -16,7 +16,6 @@ tasks.register('recoveryTest', Test) {
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
     useJUnitPlatform { setExcludeTags([] as Set); includeTags 'recovery' }
-    dependsOn tasks.named('testClasses')
     mustRunAfter ':cli:shardingTest'
 }
 tasks.register('packageTest', Test) {
@@ -25,6 +24,6 @@ tasks.register('packageTest', Test) {
     classpath = sourceSets.test.runtimeClasspath
     useJUnitPlatform { setExcludeTags([] as Set); includeTags 'packaged' }
     systemProperty 'starter.projectRoot', rootProject.projectDir.absolutePath
-    dependsOn tasks.named('testClasses'), ':cli:quarkusBuild', ':server:quarkusBuild'
+    dependsOn ':cli:quarkusBuild', ':server:quarkusBuild'
     mustRunAfter ':server:recoveryTest'
 }

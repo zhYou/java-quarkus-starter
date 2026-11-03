@@ -3,6 +3,7 @@ package io.github.zhyou.starter.buildlogic;
 import org.gradle.api.*;
 import org.gradle.api.attributes.*;
 import org.gradle.api.plugins.JavaBasePlugin;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.jvm.toolchain.*;
 
 public final class LocalDevelopmentPlugin implements Plugin<Project> {
@@ -14,10 +15,7 @@ public final class LocalDevelopmentPlugin implements Plugin<Project> {
             .getExtensions()
             .getByType(JavaToolchainService.class)
             .launcherFor(
-                spec -> {
-                  spec.getLanguageVersion().set(JavaLanguageVersion.of(25));
-                  spec.getVendor().set(JvmVendorSpec.ADOPTIUM);
-                });
+                project.getExtensions().getByType(JavaPluginExtension.class).getToolchain());
     var runtime =
         project
             .getConfigurations()
@@ -25,7 +23,6 @@ public final class LocalDevelopmentPlugin implements Plugin<Project> {
                 "maintenanceRuntime",
                 c -> {
                   c.setCanBeConsumed(false);
-                  c.setCanBeResolved(true);
                   c.getAttributes()
                       .attribute(
                           Usage.USAGE_ATTRIBUTE,
@@ -114,7 +111,6 @@ public final class LocalDevelopmentPlugin implements Plugin<Project> {
               task.getDbMode()
                   .set(project.getProviders().gradleProperty("dbMode").orElse("single"));
               task.getDbName().set(project.getProviders().gradleProperty("dbName").orElse(""));
-              task.getJavaLauncher().set(launcher);
               task.setClasspath(
                   project.files(
                       project

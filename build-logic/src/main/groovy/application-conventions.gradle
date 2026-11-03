@@ -1,7 +1,7 @@
 import io.github.zhyou.starter.buildlogic.LocalDevEnvironment
 
 plugins {
-    id 'starter.java-conventions'
+    id 'java-conventions'
     id 'io.quarkus'
 }
 dependencies {
@@ -13,7 +13,6 @@ tasks.register('shardingTest', Test) {
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
     useJUnitPlatform { setExcludeTags([] as Set); includeTags 'sharding' }
-    dependsOn tasks.named('testClasses')
     mustRunAfter tasks.named('test')
 }
 tasks.named('quarkusDev') {

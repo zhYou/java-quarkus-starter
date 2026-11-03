@@ -1,12 +1,12 @@
 # 兼容性记录
 
-基线日期：2026-10-29。实际验证平台：Linux x86_64，Docker Engine 29.9.1。2026-11-02 的 Groovy/build-logic 和 Java 工具迁移验收见 [验证记录](verification.md#2026-11-02gradle-构建逻辑与开发工具改造)，构建与 CLI 约定见 [Gradle](gradle.md)、[CLI](cli.md)。
+基线日期：2026-10-29。实际验证平台：Linux x86_64，Docker Engine 29.9.1。2026-11-02 的 Groovy/build-logic 和 Java 工具迁移验收见 [验证记录](verification.md#2026-11-02gradle-构建逻辑与开发工具改造)；2026-11-03 起由环境提供运行 Gradle 的 Temurin 25，移除 Daemon JVM criteria 和 mise 任务包装。构建与 CLI 约定见 [Gradle](gradle.md)、[CLI](cli.md)。
 
 | 组件 | 固定选择 | 实际验证 |
 |---|---|---|
 | Quarkus | 3.40.1.1 LTS，BOM/插件同源版本目录 | CLI、HTTP、真实 Jar 与两种 DB 模式 |
 | Gradle | 9.8.2，Wrapper SHA-256 | 所有构建均经 Wrapper |
-| 编译/测试 JDK | Temurin 25.0.5+8-LTS，Toolchain/Daemon 标准 Java 25 | Gradle 自动获取，javaPath 与测试进程 |
+| JDK | Temurin 25.0.5+8-LTS，运行 Gradle 与业务 Toolchain 均使用 Java 25 | 环境提供 Gradle JDK；javaPath 查询业务 Toolchain |
 | OCI JRE | Temurin 25.0.4.1+1-LTS Alpine，摘要固定 | 镜像内 java -version、非 root CLI/HTTP 和 SIGTERM |
 | PostgreSQL | postgres:18.6-alpine，摘要固定 | 仓储、迁移、权限、并发、pg_dump/pg_restore |
 | Citus | citusdata/citus:14.2.0-alpine，内置 PostgreSQL 18.4，摘要固定 | 一协调两 worker、物理路由、重启、重复初始化、示例恢复 |
@@ -14,7 +14,7 @@
 | Spotless / google-java-format | 8.10.4 / 1.36.1 | Java 25 下 spotlessApply/check |
 | 辅助工具 | mise.toml 精确版本 | doctor、工具帮助、actionlint、kubeconform |
 
-编译 JDK 与当前可获取的 OCI JRE 都属于 Java 25 LTS；JRE 的补丁版本单独固定，更新后需重新跑镜像冒烟。宿主 Java 27 只作 Wrapper 引导，不决定项目编译目标。没有修改全局 mise Java、Gradle 或 MCP。
+编译 JDK 与当前可获取的 OCI JRE 都属于 Java 25 LTS；JRE 的补丁版本单独固定，更新后需重新跑镜像冒烟。运行 Wrapper 前通过 JAVA_HOME 或 IDE 选择 Temurin 25，build-logic 与维护任务复用该 JDK；业务模块另由 Toolchain 指定 Temurin 25。没有修改全局 mise Java、Gradle 或 MCP。原生 Windows 尚未验收，源码编译仍显式使用 UTF-8。
 
 Git 使用 mise bootstrap 的发行版维护版本，本环境 Git 2.43.0；本次未安装或升级宿主软件包。其他工具声明精确版本，项目关闭 mise 锁文件。Serena 来自 PyPI serena-agent 2.1.0，项目元数据指向 github.com/oraios/serena；已验证命令帮助，Java LSP 的完整交互未验收。Serena 的 Python 传递依赖未完整锁定。
 

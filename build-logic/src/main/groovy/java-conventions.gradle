@@ -3,8 +3,6 @@ plugins {
     id 'com.diffplug.spotless'
 }
 def catalog = extensions.getByType(VersionCatalogsExtension).named('libs')
-group = providers.gradleProperty('group').getOrElse('io.github.zhyou')
-version = providers.gradleProperty('version').getOrElse('unspecified')
 java {
     toolchain { languageVersion = JavaLanguageVersion.of(25); vendor = JvmVendorSpec.ADOPTIUM }
 }
@@ -19,7 +17,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 tasks.withType(Test).configureEach {
     useJUnitPlatform { excludeTags 'sharding', 'recovery', 'packaged' }
-    maxParallelForks = 1
     testLogging { events 'failed', 'skipped' }
 }
 spotless {

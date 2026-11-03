@@ -65,7 +65,7 @@ class ReleaseFilesTest {
         "core/gradle.lockfile",
         "cli/gradle.lockfile",
         "server/gradle.lockfile",
-        "build-logic/conventions/gradle.lockfile",
+        "build-logic/gradle.lockfile",
         "build-logic/operations/gradle.lockfile",
         "mise.lock",
         "gradle/verification-metadata.xml"

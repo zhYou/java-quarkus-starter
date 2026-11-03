@@ -90,3 +90,24 @@ Serena 的 Python 传递依赖未完整锁定，Java LSP 交互未完整验收�
 审阅和集成验证发现的问题均先复现再修复：状态文件必须与请求的 mode/name 一致；Quarkus 开发任务需要在输入定型前延迟加载环境，并单独退出配置缓存；同模块普通/分片 HTTP 测试必须按顺序运行以避免争用 8081。修复后的完整组合命令已通过。
 
 原有上游 OpenTelemetry API usage、指标重复注册、依赖 about.html 重复和 SBOM 许可证字段提示仍保留，没有隐藏警告或跳过 Docker 测试。本次只记录 Mandrel 25 的原生构建方式，不新增或宣称验收 Native 发布流水线。生产备份仍不属于示例 JSON 恢复能力。
+
+## 2026-11-03：构建配置与命令入口精简
+
+convention 脚本及其 Java 辅助类、测试上移至 build-logic 根项目，operations 保留。三个约定 ID 改为 java-conventions、library-conventions、application-conventions。历史记录中的 conventions 子项目、Daemon JVM criteria 和 mise 任务别名安排由[本次设计](superpowers/specs/2026-11-03-simplify-gradle-design.md)取代。
+
+先在隔离 worktree 运行 buildLogicCheck 确认基线，再只更新 TestKit 使用的插件 ID；三个用例均因新 ID 无法解析而失败。完成迁移后原用例通过。格式化和 buildLogicCheck 分别以 3 秒、9 秒执行成功。
+
+环境通过命令级 JAVA_HOME 提供已有的 Temurin 25.0.5+8-LTS，没有修改全局配置。删除 Daemon JVM criteria 后，`./gradlew --version` 显示 Launcher 与 Daemon 使用同一 Java 25，`./gradlew -q :core:javaPath` 返回相同 JDK。源码编译仍显式使用 UTF-8，仅删除重复的 JVM 编码参数。
+
+完整验证命令：
+
+```bash
+./gradlew check shardingCheck packageCheck assembleRelease \
+  --rerun-tasks --no-build-cache --console=plain
+```
+
+结果 BUILD SUCCESSFUL，2 分 41 秒，70 个任务全部执行。构建逻辑 26 项、业务与真实进程 36 项测试全部通过，失败、错误和跳过均为 0，包含真实 Citus、两种恢复及 Jar 进程测试。
+
+另外核对了 5 个发布文件的 SHA-256、server 归档中的运行时依赖和统一时间戳；CLI/server 的 CycloneDX 清单分别包含 269/439 个组件。mise TOML 可解析，全部 18 个任务包装已删除，辅助工具与 bootstrap 声明保留。现行使用文档已统一直接调用 Wrapper；`./gradlew doctor` 通过。
+
+本次验证环境为 Linux/WSL2 x86_64，原生 Windows、Native Image 和真实 Serena Java LSP 全流程未验收。既有上游遥测、重复资源和 SBOM 许可证提示未隐藏。

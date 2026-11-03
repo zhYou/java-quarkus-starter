@@ -4,13 +4,15 @@ Java 25 LTS、Quarkus 3.40 LTS、Gradle Wrapper 多模块模板。core 共享订
 
 ## 快速开始
 
-需要 Docker Engine/Compose，以及一个可引导 Wrapper 的兼容 Java（17 或更新版本）。项目编译、测试和运行任务使用 Gradle 自动获取的 Temurin 25；mise 不管理 Java 或 Gradle。
+需要 Docker Engine/Compose 和 Temurin 25。通过 `JAVA_HOME` 或 IDE 的 Gradle JVM 设置选择 Temurin 25；运行 Gradle 的 JDK 由环境提供，业务模块的编译、测试和 JavaExec 使用公共 Toolchain 约定。mise 仅管理辅助工具，Gradle 版本由 Wrapper 提供。
 
 ```bash
 mise trust
 mise install
-mise run doctor
-mise run db:up
+# Bash 中激活辅助工具环境；已完成 mise shell 集成时可省略：
+eval "$(mise activate bash)"
+./gradlew doctor
+./gradlew dbUp
 ./gradlew check
 ```
 
@@ -19,9 +21,9 @@ Git 通过 mise bootstrap 使用宿主包管理器维护：`mise bootstrap packa
 运行 CLI：
 
 ```bash
-mise run cli -- --args="--output=json orders create --customer-id 00000000-0000-0000-0000-000000000001 --description 'first order'"
-mise run cli -- --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
-mise run dev
+./gradlew -q --console=plain runCli --args="--output=json orders create --customer-id 00000000-0000-0000-0000-000000000001 --description 'first order'"
+./gradlew -q --console=plain runCli --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
+./gradlew dev
 ```
 
 服务启动后：
@@ -38,7 +40,7 @@ API 的读取/完成始终需要 customerId 与 id。当前示例未实现认证
 ## 分片示例与检查
 
 ```bash
-mise run sharding:up
+./gradlew dbUp -PdbMode=sharding
 ./gradlew -q --console=plain runCli -PdbMode=sharding \
   --args='--output=json orders list --customer-id 00000000-0000-0000-0000-000000000001'
 ./gradlew shardingCheck
@@ -66,11 +68,11 @@ set +a
 java -jar server/build/quarkus-app/quarkus-run.jar
 ```
 
-服务分发必须携带整个 server/build/quarkus-app 目录；CLI 分发单个 uber-jar。直接执行 Java 命令需要 Java 25 或更新版本，`mise run cli/dev` 使用 Gradle 的 Java 25。运行应用只需 APP_DB_JDBC_URL、APP_DB_USERNAME、APP_DB_PASSWORD；不要给生产服务迁移或管理凭据。上面的 source 方式仅用于本地演示。
+服务分发必须携带整个 server/build/quarkus-app 目录；CLI 分发单个 uber-jar。直接执行 Java 命令需要 Java 25 或更新版本；`./gradlew runCli` 复用运行 Gradle 的 JDK，`./gradlew dev` 使用应用模块的 Toolchain。运行应用只需 APP_DB_JDBC_URL、APP_DB_USERNAME、APP_DB_PASSWORD；不要给生产服务迁移或管理凭据。上面的 source 方式仅用于本地演示。
 
 迁移独立于 Quarkus 启动：`./gradlew :core:migrate`，从 APP_DB_MODE=single|sharding、APP_DB_JDBC_URL、APP_DB_MIGRATION_USERNAME、APP_DB_MIGRATION_PASSWORD 取值。正常应用只校验 schema。CLI 成功/输入/缺失/冲突/内部错误退出码分别为 0/2/3/4/1；`--output=json` 标准输出保持一个 JSON 值。
 
-`mise run db:down`、`mise run sharding:down` 保留数据卷；reset 必须显式加 `-PconfirmLocalReset=true`。本地凭据、状态和备份在受忽略的 .local 中，保留状态文件才能安全管理已有环境。
+`./gradlew dbDown`、`./gradlew dbDown -PdbMode=sharding` 保留数据卷；`dbReset` 必须显式加 `-PconfirmLocalReset=true`。本地凭据、状态和备份在受忽略的 .local 中，保留状态文件才能安全管理已有环境。
 
 ## 维护资料
 
@@ -79,6 +81,6 @@ java -jar server/build/quarkus-app/quarkus-run.jar
 - [数据库与迁移](docs/database.md)、[分片限制](docs/sharding.md)、[API](docs/api.md)
 - [操作与恢复](docs/operations.md)、[云部署](docs/cloud-deployment.md)、[数据库路线与成本](docs/database-options.md)
 - [升级与回退](docs/upgrading.md)、[扩展与 Serena](docs/extensions.md)、[实际兼容记录](docs/compatibility.md)、[验证与审阅记录](docs/verification.md)
-- [智能体约定](AGENTS.md)、[初版设计](docs/superpowers/specs/2026-10-29-java-quarkus-starter-design.md)、[构建改造设计](docs/superpowers/specs/2026-11-02-gradle-build-logic-design.md)
+- [智能体约定](AGENTS.md)、[初版设计](docs/superpowers/specs/2026-10-29-java-quarkus-starter-design.md)、[构建精简设计](docs/superpowers/specs/2026-11-03-simplify-gradle-design.md)
 
 发布工作流只归档验证后的产物；当前未执行远端发布、真实云部署或生产 HA 验证。许可证待项目维护者确定。

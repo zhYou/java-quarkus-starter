@@ -2,9 +2,8 @@ plugins {
     id 'java-gradle-plugin'
     alias(libs.plugins.spotless)
 }
-java { toolchain { languageVersion = JavaLanguageVersion.of(25); vendor = JvmVendorSpec.ADOPTIUM } }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.compilerArgs.addAll(['-Xlint:all', '-Werror']) }
-tasks.withType(Test).configureEach { useJUnitPlatform(); maxParallelForks = 1 }
+tasks.withType(Test).configureEach { useJUnitPlatform() }
 spotless { java { target 'src/**/*.java'; googleJavaFormat(libs.versions.google.java.format.get()) } }
 dependencies {
     testImplementation libs.junit.jupiter

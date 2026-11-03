@@ -1,6 +1,6 @@
 # 项目约定
 
-所有构建和项目 JDK 操作使用 ./gradlew。Gradle Daemon/Toolchain 使用 Temurin 25；mise 仅管理辅助工具，不添加 Java/Gradle。串行运行同一工作区的 Gradle 命令。不要修改全局 MCP、Java 或 mise 配置。
+所有构建和项目 JDK 操作使用 ./gradlew。环境通过 JAVA_HOME 或 IDE 提供运行 Gradle 的 Temurin 25；业务模块 Toolchain 使用 Temurin 25，源码编码显式为 UTF-8。mise 仅管理辅助工具，不添加 Java/Gradle 或 Gradle 任务包装。串行运行同一工作区的 Gradle 命令。不要修改全局 MCP、Java 或 mise 配置。
 
 core/domain 保持纯 Java，application 管用例和事务，persistence 管 JPA，maintenance 管独立迁移和样例恢复。cli 与 server 只依赖 core，彼此独立。新业务规则集中到 core，不在入口复制实现。
 
@@ -12,7 +12,7 @@ CLI offline preflight 不启动 Quarkus；业务执行启用 CDI 请求上下文
 
 本地状态和凭据放 .local（目录700、文件600），禁止提交或打印。Docker 操作必须通过项目记录的 Compose 归属；down 保留卷，reset 要显式确认，禁止全局 prune。恢复总是新建目标，不自动替换源连接。Citus JSON 只用于本模板停写后的订单示例，生产使用专门备份方案。
 
-辅助工具版本声明在 mise.toml，项目关闭 mise 锁文件，Git 使用 mise bootstrap 的宿主软件包。Serena 按需 `mise run serena`，子进程复用 Gradle JDK；构建和 CI 不依赖 MCP。Serena 的 Python 传递依赖当前未完整锁定。
+辅助工具版本声明在 mise.toml，项目关闭 mise 锁文件，Git 使用 mise bootstrap 的宿主软件包。Serena 按需 `./gradlew -q --console=plain serena`，子进程复用运行 Gradle 的 JDK；构建和 CI 不依赖 MCP。Serena 的 Python 传递依赖当前未完整锁定。
 
 Quarkus BOM 与插件共用 gradle/libs.versions.toml 版本，保持 LTS 主线。依赖变更更新版本声明，并重新跑相关真实测试；不维护 Gradle/mise 锁文件或依赖校验元数据。保留 Wrapper 分发包与发布产物的 SHA-256 校验。产物、CI、部署和文档中的命令要能复现。清单只暴露业务 Service，管理端口仅内部探针/指标。合并、发布和云资源操作须经用户明确授权。
 

@@ -34,7 +34,7 @@ class LocalDevConventionTest {
     Files.writeString(
         root.resolve("build.gradle"),
         """
-      plugins { id 'starter.quarkus-application-conventions' }
+      plugins { id 'application-conventions' }
       def environment = tasks.named('quarkusDev').get().environmentVariables.get()
       if (environment.APP_DB_JDBC_URL != 'jdbc:postgresql://127.0.0.1:15432/starter') {
           throw new GradleException('Local environment missing before task input finalization')
