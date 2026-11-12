@@ -1,5 +1,5 @@
 [versions]
-quarkus = "3.40.1.1"
+quarkus = "3.40.1.2"
 spotless = "8.10.4"
 archunit = "1.5.1"
 google-java-format = "1.36.1"
